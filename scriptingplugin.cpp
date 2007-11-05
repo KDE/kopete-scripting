@@ -87,7 +87,7 @@ ScriptingPlugin::ScriptingPlugin(QObject* parent, const QVariantList&)
     KAction *action = new KAction ( KIcon ( "document-encrypt" ), i18n ( "CCCCCCCCCCCCCCCCC" ), this );
     actionCollection()->addAction ( "actionSendAdvert", action );
 
-    setXMLFile("scriptingui.rc");
+    setXMLFile("scripting.rc");
 }
 
 ScriptingPlugin::~ScriptingPlugin()
