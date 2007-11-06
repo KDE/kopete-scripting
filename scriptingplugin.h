@@ -50,6 +50,9 @@ class ScriptingPlugin : public Kopete::Plugin
         void slotActionFinished(Kross::Action*);
         void slotActionFinalized(Kross::Action*);
 
+        // this will be called by Kopete::CommandHandler
+        void commandExecuted(const QString& command, Kopete::ChatSession* chatsessions);
+
     private:
         class Private;
         Private* const d;

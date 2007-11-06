@@ -36,7 +36,7 @@ class ScriptingInterfacePrivate : public QObject
         ScriptingInterface* interface;
         QObject* dbusiface;
         QList<Kopete::ChatSession*> kChats; //to be sure we keep a copy of the sessions list
-        QVariantList vChats; //QList<ScriptingChatSession*>
+        QVariantList vChats; //QList<ScriptingChat*>
 
         explicit ScriptingInterfacePrivate(ScriptingInterface* iface) : interface(iface), dbusiface(0)
         {

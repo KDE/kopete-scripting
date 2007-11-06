@@ -74,12 +74,18 @@ ScriptingPlugin::ScriptingPlugin(QObject* parent, const QVariantList&)
     foreach(QString file, group.readEntry("files_enabled", QStringList()))
         d->triggerAction( d->createAction(file) );
 
-    unplugActionList("scripting_edit");
-    QList<QAction*> editlist;
-    editlist << new KAction(KIcon("document-import"), i18n("AAAAAAAAAAAAAAAAA"), this);
-    plugActionList("scripting_edit", editlist);
 
-    unplugActionList("scripting_contact");
+
+    setXMLFile("scripting.rc");
+
+    //unplugActionList("scripting_menu_tools");
+    QList<QAction*> editlist;
+    KAction* aaa = new KAction(KIcon("document-import"), i18n("AAAAAAAAAAAAAAAAA"), this);
+    actionCollection()->addAction("atze", aaa);
+    editlist << aaa;
+    plugActionList("scripting_menu_tools", editlist);
+
+    //unplugActionList("scripting_contact");
     QList<QAction*> contactlist;
     contactlist << new KAction(KIcon("document-export"), i18n("BBBBBBBBBBBBBBB"), this);
     plugActionList( "scripting_contact", contactlist );
@@ -104,28 +110,28 @@ ScriptingPlugin* ScriptingPlugin::plugin()
 
 void ScriptingPlugin::aboutToUnload()
 {
-    kDebug()<<"........... ScriptingPlugin::aboutToUnload";
+    kDebug()<<"ScriptingPlugin::aboutToUnload";
     d->interface->emitPluginFinish();
     Kopete::Plugin::aboutToUnload();
 }
 
 void ScriptingPlugin::slotMessageReceived( Kopete::Message& msg )
 {
-    kDebug()<<"........... ScriptingPlugin::slotReceivedMessage subject="<<msg.subject()<<"plainBody="<<msg.plainBody();
+    kDebug()<<"ScriptingPlugin::slotReceivedMessage subject="<<msg.subject()<<"plainBody="<<msg.plainBody();
     ScriptingMessage message(&msg);
     d->interface->emitMessageReceived(&message);
 }
 
 void ScriptingPlugin::slotMessageSent(Kopete::Message& msg)
 {
-    kDebug()<<"........... ScriptingPlugin::slotMessageSent subject="<<msg.subject()<<"plainBody="<<msg.plainBody();
+    kDebug()<<"ScriptingPlugin::slotMessageSent subject="<<msg.subject()<<"plainBody="<<msg.plainBody();
     ScriptingMessage message(&msg);
     d->interface->emitMessageSent(&message);
 }
 
 void ScriptingPlugin::slotItemChanged(const QString& file, bool enabled)
 {
-    kDebug()<<"........... ScriptingPlugin::slotItemChanged file="<<file<<"enabled="<<enabled;
+    kDebug()<<"ScriptingPlugin::slotItemChanged file="<<file<<"enabled="<<enabled;
 
     Kross::Action* action = d->collection->action(file);
     if( action ) {
@@ -147,18 +153,18 @@ void ScriptingPlugin::slotItemChanged(const QString& file, bool enabled)
 
 void ScriptingPlugin::slotSettingsChanged()
 {
-    kDebug()<<"........... ScriptingPlugin::slotSettingsChanged";
+    kDebug()<<"ScriptingPlugin::slotSettingsChanged";
     d->interface->emitSettingsChanged();
 }
 
 void ScriptingPlugin::slotActionFinished(Kross::Action*)
 {
-    kDebug()<<"........... ScriptingPlugin::slotActionFinished";
+    kDebug()<<"ScriptingPlugin::slotActionFinished";
 }
 
 void ScriptingPlugin::slotActionFinalized(Kross::Action*)
 {
-    kDebug()<<"........... ScriptingPlugin::slotActionFinalized";
+    kDebug()<<"ScriptingPlugin::slotActionFinalized";
     /*
     if( action->hadError() ) {
         if( action->errorTrace().isNull() )
@@ -167,6 +173,12 @@ void ScriptingPlugin::slotActionFinalized(Kross::Action*)
             KMessageBox::detailedError(0, action->errorMessage(), action->errorTrace());
     }
     */
+}
+
+void ScriptingPlugin::commandExecuted(const QString& command, Kopete::ChatSession* chatsessions)
+{
+    kDebug()<<"ScriptingPlugin::commandExecuted command="<<command;
+    d->interface->emitCommandExecuted(command, chatsessions);
 }
 
 #include "scriptingplugin.moc"

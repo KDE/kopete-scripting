@@ -19,6 +19,9 @@ def pluginInit():
     print "identities=%s" % iface.identities()
     #iface.setStatusMessage("Some statusmessage")
 
+    Kopete.addCommand("myscript", "USAGE: /myscript- Does something", 0, -1, "python")
+    Kopete.addCommand("myotherscript", "USAGE: /myotherscript - Does something", 0, -1, "python")
+
 # This function got called if the plugin is going to be shutdown.
 def pluginFinish():
     print "===============> pluginFinish"
@@ -28,29 +31,30 @@ def pluginFinish():
 def messageReceived(message):
     print "===============> messageReceived subject=%s message=%s" % (message.subject(), message.plainBody())
     message.setPlainBody("RECEIVED %s" % message.plainBody())
-
-    print "11111111111111111111111111"
     chats = Kopete.chats()
-    print "=====> %s" % chats
+    print "%s" % chats
     for c in chats:
         print c.displayName()
-    print "22222222222222222222222222"
 
 # This function got called if we sent a new message.
 def messageSent(message):
-    print "===============> messageSend subject=%s message=%s" % (message.subject(), message.plainBody())
+    print "!===============> messageSend subject=%s message=%s" % (message.subject(), message.plainBody())
     message.setPlainBody("SEND %s" % message.plainBody())
 
 # This function got called if a new chatsession opened.
 def chatAdded(chat):
-    print "===============> chatAdded chat=%s" % chat
+    print "!===============> chatAdded chat=%s" % chat
 
 # This function got called if a opened chatsession got closed.
 def chatRemoved(chat):
-    print "===============> chatRemoved chat=%s" % chat
+    print "!===============> chatRemoved chat=%s" % chat
     
+# This function got called if a command got executed.
+def commandExecuted(command, chat):
+    print "===============> commandExecuted command=%s chat=%s" % (command,chat)
+
 # This function got called if settings changed.
 def settingsChanged():
     print "===============> settingsChanged"
 
-print "===============> Testcase.py loaded"
+print "Testcase.py loaded"

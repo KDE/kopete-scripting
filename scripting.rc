@@ -3,14 +3,20 @@
 	<MenuBar>
 		<Menu name="edit">
 			<text>&amp;Edit</text>
-            <ActionList name="scripting_edit" />
+            <ActionList name="scripting_menu_tools" />
 		</Menu>
         <Menu name="tools">
             <text>&amp;Tools</text>
             <Action name="actionSendAdvert"/>
+            <ActionList name="scripting_menu_tools" />
         </Menu>
 	</MenuBar>
 	<Menu name="contact_popup">
         <ActionList name="scripting_contact" />
+    </Menu>
+    <Menu name="tools">
+        <text>&amp;Tools2</text>
+        <Action name="actionSendAdvert"/>
+        <ActionList name="scripting_menu_tools" />
     </Menu>
 </kpartgui>
