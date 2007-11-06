@@ -164,7 +164,7 @@ ScriptingInterface::~ScriptingInterface()
     delete d;
 }
 
-void ScriptingInterface::emitCommandExecuted(const QString& command, Kopete::ChatSession* chatsessions)
+void ScriptingInterface::emitCommandExecuted(const QString& command, const QStringList& args, Kopete::ChatSession* chatsessions)
 {
     kDebug()<<"ScriptingInterface::emitCommandExecuted command="<<command;
     int idx = d->kChats.indexOf(chatsessions);
@@ -179,7 +179,7 @@ void ScriptingInterface::emitCommandExecuted(const QString& command, Kopete::Cha
     Q_ASSERT( chat );
     Q_ASSERT( chat->chat() == chatsessions );
     if( chat )
-        emit commandExecuted(command, chat);
+        emit commandExecuted(command, args, chat);
 }
 
 QObject* ScriptingInterface::interface()

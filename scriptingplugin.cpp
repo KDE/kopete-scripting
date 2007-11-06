@@ -177,8 +177,15 @@ void ScriptingPlugin::slotActionFinalized(Kross::Action*)
 
 void ScriptingPlugin::commandExecuted(const QString& command, Kopete::ChatSession* chatsessions)
 {
-    kDebug()<<"ScriptingPlugin::commandExecuted command="<<command;
-    d->interface->emitCommandExecuted(command, chatsessions);
+    Q_ASSERT( QObject::sender() );
+    if( ! QObject::sender() )
+        return;
+    QString name = QObject::sender()->objectName();
+    if( name.toLower().endsWith("_command") )
+        name = name.left( name.count() - 8 );
+    kDebug()<<"ScriptingPlugin::commandExecuted name="<<name<<"command="<<command;
+    QStringList args = Kopete::CommandHandler::parseArguments(command);
+    d->interface->emitCommandExecuted(name, args, chatsessions);
 }
 
 #include "scriptingplugin.moc"

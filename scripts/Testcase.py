@@ -50,8 +50,8 @@ def chatRemoved(chat):
     print "!===============> chatRemoved chat=%s" % chat
     
 # This function got called if a command got executed.
-def commandExecuted(command, chat):
-    print "===============> commandExecuted command=%s chat=%s" % (command,chat)
+def commandExecuted(name, args, chat):
+    print "===============> commandExecuted name=%s args=%s chat=%s" % (name,args,chat)
 
 # This function got called if settings changed.
 def settingsChanged():

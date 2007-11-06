@@ -163,7 +163,7 @@ class ScriptingInterface : public QObject
         void emitMessageReceived(ScriptingMessage* message) { emit messageReceived(message); }
         void emitMessageSent(ScriptingMessage* message) { emit messageSent(message); }
         void emitSettingsChanged() { emit settingsChanged(); }
-        void emitCommandExecuted(const QString& command, Kopete::ChatSession* chatsessions);
+        void emitCommandExecuted(const QString& command, const QStringList& args, Kopete::ChatSession* chatsessions);
 
     public Q_SLOTS:
 
@@ -200,7 +200,7 @@ class ScriptingInterface : public QObject
         void chatRemoved(QObject* chat);
 
         /// This signal got emitted if a registered command got executed.
-        void commandExecuted(const QString& command, QObject* chat);
+        void commandExecuted(const QString& command, const QStringList& args, QObject* chat);
 
         /// This signal got emitted if the Kopete settings changed.
         void settingsChanged();
