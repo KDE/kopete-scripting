@@ -110,7 +110,7 @@ class ScriptingChat : public QObject, public KXMLGUIClient
         /// Return a \a Kopete::Contact object.
         QObject* myself() const;
         /// Return a \a Kopete::Account object.
-        QObject* account() /*const*/ ;
+        QObject* account() const;
 
         /// Return the display-caption of the chat.
         const QString displayName();
@@ -165,7 +165,7 @@ class ScriptingInterface : public QObject
         void emitPluginFinish() { emit pluginFinish(); }
         void emitMessageReceived(ScriptingMessage* message) { emit messageReceived(message); }
         void emitMessageSent(ScriptingMessage* message) { emit messageSent(message); }
-        void emitCommandExecuted(const QString& command, const QStringList& args, Kopete::ChatSession* chatsessions);
+        void emitCommandExecuted(Kopete::ChatSession* chatsessions, const QString& command, const QStringList& args);
         void emitActionExecuted(ScriptingChat* chat, const QString &name) { emit actionExecuted(chat, name); }
         void emitSettingsChanged() { emit settingsChanged(); }
 
@@ -204,7 +204,7 @@ class ScriptingInterface : public QObject
         void chatRemoved(QObject* chat);
 
         /// This signal got emitted if a custom command got executed.
-        void commandExecuted(const QString& command, const QStringList& args, QObject* chat);
+        void commandExecuted(QObject* chat, const QString& command, const QStringList& args);
         /// This signal got emitted if a custom action got executed.
         void actionExecuted(QObject* chat, const QString &name);
 

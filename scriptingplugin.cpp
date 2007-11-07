@@ -21,7 +21,6 @@
 #include <kgenericfactory.h>
 #include <kmessagebox.h>
 #include <kactioncollection.h>
-#include <kxmlguifactory.h>
 
 #include <kross/core/manager.h>
 #include <kross/core/action.h>
@@ -165,7 +164,7 @@ void ScriptingPlugin::commandExecuted(const QString& command, Kopete::ChatSessio
         name = name.left( name.count() - 8 );
     kDebug()<<"ScriptingPlugin::commandExecuted name="<<name<<"command="<<command;
     QStringList args = Kopete::CommandHandler::parseArguments(command);
-    d->interface->emitCommandExecuted(name, args, chatsessions);
+    d->interface->emitCommandExecuted(chatsessions, name, args);
 }
 
 #include "scriptingplugin.moc"

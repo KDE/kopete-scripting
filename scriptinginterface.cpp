@@ -18,7 +18,6 @@
 #include "scriptingplugin.h"
 
 #include <QDBusConnection>
-#include <kxmlguifactory.h>
 
 /***********************************************************************************************
 * ScriptingMessage
@@ -113,7 +112,7 @@ QVariantList ScriptingChat::members() const
 }
 
 QObject* ScriptingChat::myself() const { return const_cast<Kopete::Contact*>( m_chat->myself() ); }
-QObject* ScriptingChat::account() { return m_chat->account(); }
+QObject* ScriptingChat::account() const { return m_chat->account(); }
 
 const QString ScriptingChat::displayName() { return m_chat->displayName(); }
 void ScriptingChat::setDisplayName(const QString& displayname) { m_chat->setDisplayName(displayname); }
@@ -169,7 +168,7 @@ ScriptingInterface::~ScriptingInterface()
     delete d;
 }
 
-void ScriptingInterface::emitCommandExecuted(const QString& command, const QStringList& args, Kopete::ChatSession* chatsessions)
+void ScriptingInterface::emitCommandExecuted(Kopete::ChatSession* chatsessions, const QString& command, const QStringList& args)
 {
     kDebug()<<"ScriptingInterface::emitCommandExecuted command="<<command;
     int idx = d->kChats.indexOf(chatsessions);
@@ -184,7 +183,7 @@ void ScriptingInterface::emitCommandExecuted(const QString& command, const QStri
     Q_ASSERT( chat );
     Q_ASSERT( chat->chat() == chatsessions );
     if( chat )
-        emit commandExecuted(command, args, chat);
+        emit commandExecuted(chat, command, args);
 }
 
 QObject* ScriptingInterface::interface()
