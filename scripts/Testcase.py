@@ -44,14 +44,20 @@ def messageSent(message):
 # This function got called if a new chatsession opened.
 def chatAdded(chat):
     print "!===============> chatAdded chat=%s" % chat
+    chat.addAction("myaction1", "My First Action", "python")
+    chat.addAction("myaction2", "My Second Action", "python")
 
 # This function got called if a opened chatsession got closed.
 def chatRemoved(chat):
     print "!===============> chatRemoved chat=%s" % chat
     
-# This function got called if a command got executed.
+# This function got called if a custom command got executed.
 def commandExecuted(name, args, chat):
     print "===============> commandExecuted name=%s args=%s chat=%s" % (name,args,chat)
+
+# This function got executed if a custom action got executed.
+def actionExecuted(chat, name):
+    print "===============> actionExecuted chat=%s name=%s" % (chat,name)
 
 # This function got called if settings changed.
 def settingsChanged():

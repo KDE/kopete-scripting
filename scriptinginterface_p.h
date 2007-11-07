@@ -57,7 +57,7 @@ class ScriptingInterfacePrivate : public QObject
             connect(chatsessions, SIGNAL(closing(Kopete::ChatSession*)), this, SLOT(removeChat(Kopete::ChatSession*)));
             kChats << chatsessions;
             QVariant v;
-            ScriptingChat* chat = new ScriptingChat(this, chatsessions);
+            ScriptingChat* chat = new ScriptingChat(interface, chatsessions);
             v.setValue( (QObject*) chat );
             vChats << v;
             emit chatAdded(chat);

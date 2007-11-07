@@ -21,6 +21,7 @@
 #include <kgenericfactory.h>
 #include <kmessagebox.h>
 #include <kactioncollection.h>
+#include <kxmlguifactory.h>
 
 #include <kross/core/manager.h>
 #include <kross/core/action.h>
@@ -73,27 +74,6 @@ ScriptingPlugin::ScriptingPlugin(QObject* parent, const QVariantList&)
     KConfigGroup group(config, "scripts");
     foreach(QString file, group.readEntry("files_enabled", QStringList()))
         d->triggerAction( d->createAction(file) );
-
-
-
-    setXMLFile("scripting.rc");
-
-    //unplugActionList("scripting_menu_tools");
-    QList<QAction*> editlist;
-    KAction* aaa = new KAction(KIcon("document-import"), i18n("AAAAAAAAAAAAAAAAA"), this);
-    actionCollection()->addAction("atze", aaa);
-    editlist << aaa;
-    plugActionList("scripting_menu_tools", editlist);
-
-    //unplugActionList("scripting_contact");
-    QList<QAction*> contactlist;
-    contactlist << new KAction(KIcon("document-export"), i18n("BBBBBBBBBBBBBBB"), this);
-    plugActionList( "scripting_contact", contactlist );
-
-    KAction *action = new KAction ( KIcon ( "document-encrypt" ), i18n ( "CCCCCCCCCCCCCCCCC" ), this );
-    actionCollection()->addAction ( "actionSendAdvert", action );
-
-    setXMLFile("scripting.rc");
 }
 
 ScriptingPlugin::~ScriptingPlugin()

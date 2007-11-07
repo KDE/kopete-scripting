@@ -22,6 +22,7 @@
 #include <kopete/kopetechatsessionmanager.h>
 #include <kopete/kopetechatsession.h>
 #include <kopete/kopetecommandhandler.h>
+#include <kopete/ui/kopeteview.h>
 
 #include <QObject>
 #include <QPointer>
@@ -31,6 +32,7 @@
 #include <kdebug.h>
 
 class ScriptingPlugin;
+class ScriptingInterface;
 
 /**
 * The ScriptingMessage class wraps a \a Kopete::Message to provide a scripting API
@@ -93,14 +95,14 @@ class ScriptingChat : public QObject, public KXMLGUIClient
 {
         Q_OBJECT
     public:
-        ScriptingChat(QObject *parent, Kopete::ChatSession *chat);
+        ScriptingChat(ScriptingInterface *iface, Kopete::ChatSession *chat);
         virtual ~ScriptingChat();
         Kopete::ChatSession* chat() const;
 
     public Q_SLOTS:
 
         /// Add a new action to the chat window.
-        QObject* addAction(const QString& name, const QString& text, const QString& icon);
+        QObject* addAction(const QString& name, const QString& text, const QString& icon = QString());
 
         /// Get a list of \a Kopete::Contact instance of all contacts in the chat session.
         QVariantList members() const;
@@ -108,7 +110,7 @@ class ScriptingChat : public QObject, public KXMLGUIClient
         /// Return a \a Kopete::Contact object.
         QObject* myself() const;
         /// Return a \a Kopete::Account object.
-        QObject* account() const;
+        QObject* account() /*const*/ ;
 
         /// Return the display-caption of the chat.
         const QString displayName();
@@ -131,17 +133,18 @@ class ScriptingChat : public QObject, public KXMLGUIClient
         /// This signal is emitted if a new message in the chat got sent.
         void sent(ScriptingMessage* message);
 
-        /// This signal is emitted if an action added with addAction() got executed.
-        void actionTriggered(const QString &name);
-
     private Q_SLOTS:
         void emitAppended(Kopete::Message& msg);
         void emitReceived(Kopete::Message& msg);
         void emitSent(Kopete::Message& msg);
+        void slotViewActivated(KopeteView* view);
+        void slotActionExecuted(const QString &name);
 
     private:
+        ScriptingInterface *m_iface;
         Kopete::ChatSession *m_chat;
         QSignalMapper* m_signalMapper;
+        QList<QAction*> m_actions;
 };
 
 class ScriptingInterfacePrivate;
@@ -162,8 +165,9 @@ class ScriptingInterface : public QObject
         void emitPluginFinish() { emit pluginFinish(); }
         void emitMessageReceived(ScriptingMessage* message) { emit messageReceived(message); }
         void emitMessageSent(ScriptingMessage* message) { emit messageSent(message); }
-        void emitSettingsChanged() { emit settingsChanged(); }
         void emitCommandExecuted(const QString& command, const QStringList& args, Kopete::ChatSession* chatsessions);
+        void emitActionExecuted(ScriptingChat* chat, const QString &name) { emit actionExecuted(chat, name); }
+        void emitSettingsChanged() { emit settingsChanged(); }
 
     public Q_SLOTS:
 
@@ -199,8 +203,10 @@ class ScriptingInterface : public QObject
         /// This signal got emitted if a chat got removed.
         void chatRemoved(QObject* chat);
 
-        /// This signal got emitted if a registered command got executed.
+        /// This signal got emitted if a custom command got executed.
         void commandExecuted(const QString& command, const QStringList& args, QObject* chat);
+        /// This signal got emitted if a custom action got executed.
+        void actionExecuted(QObject* chat, const QString &name);
 
         /// This signal got emitted if the Kopete settings changed.
         void settingsChanged();

@@ -18,6 +18,7 @@
 #include "scriptingplugin.h"
 
 #include <QDBusConnection>
+#include <kxmlguifactory.h>
 
 /***********************************************************************************************
 * ScriptingMessage
@@ -71,30 +72,23 @@ void ScriptingMessage::setBackgroundColor(const QColor& color) { m_message->setB
 * ScriptingChat
 */
 
-ScriptingChat::ScriptingChat(QObject *parent, Kopete::ChatSession *chat) : QObject(parent), KXMLGUIClient(chat), m_chat(chat)
+ScriptingChat::ScriptingChat(ScriptingInterface *iface, Kopete::ChatSession *chat) : QObject(iface), KXMLGUIClient(chat), m_iface(iface), m_chat(chat)
 {
     setObjectName("KopeteChat");
 
     m_signalMapper = new QSignalMapper(this);
-    connect(m_signalMapper, SIGNAL(mapped(const QString &)), this, SIGNAL(actionTriggered(const QString &)));
+    connect(m_signalMapper, SIGNAL(mapped(QString)), this, SLOT(slotActionExecuted(QString)));
 
     //connect(m_chat, SIGNAL(closing(Kopete::ChatSession*)), SIGNAL(closing()));
     connect(m_chat, SIGNAL(messageAppended(Kopete::Message&)), SLOT(emitAppended(Kopete::Message&)));
     connect(m_chat, SIGNAL(messageReceived(Kopete::Message&)), SLOT(emitReceived(Kopete::Message&)));
     connect(m_chat, SIGNAL(messageSent(Kopete::Message&)), SLOT(emitSent(Kopete::Message&)));
 
+    //connect(Kopete::ChatSessionManager::self(), SIGNAL(viewCreated(KopeteView*)), SLOT(slotViewCreated(KopeteView*)));
+    connect(Kopete::ChatSessionManager::self(), SIGNAL(viewActivated(KopeteView*)), SLOT(slotViewActivated(KopeteView*)));
+    //connect(Kopete::ChatSessionManager::self(), SIGNAL(viewClosing(KopeteView*)), SLOT(slotViewClosing(KopeteView*)));
+
     setXMLFile("scripting.rc");
-
-    unplugActionList("scripting_menu_tools");
-    QList<QAction*> contactlist;
-    KAction* aaa = new KAction(KIcon("document-export"), "MyOtherTestAction", this);
-    actionCollection()->addAction ( "mytestaction", aaa);
-    contactlist << aaa;
-    plugActionList( "scripting_menu_tools", contactlist );
-
-    KAction *action = new KAction ( KIcon ( "document-encrypt" ), "MyTestAction1" /*i18n("")*/, this );
-    actionCollection()->addAction ( "actionSendAdvert", action );
-   
 }
 
 ScriptingChat::~ScriptingChat() {}
@@ -102,11 +96,11 @@ Kopete::ChatSession* ScriptingChat::chat() const { return m_chat; }
 
 QObject* ScriptingChat::addAction(const QString& name, const QString& text, const QString& icon)
 {
-    KAction *action = new KAction(KIcon(icon), text, this);
+    KAction *action = icon.isEmpty() ? new KAction(text, this) : new KAction(KIcon(icon), text, this);
     action->setObjectName(name);
     connect(action, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
     m_signalMapper->setMapping(action, name);
-    actionCollection()->addAction(name, action);
+    m_actions << action;
     return action;
 }
 
@@ -119,7 +113,7 @@ QVariantList ScriptingChat::members() const
 }
 
 QObject* ScriptingChat::myself() const { return const_cast<Kopete::Contact*>( m_chat->myself() ); }
-QObject* ScriptingChat::account() const { return m_chat->account(); }
+QObject* ScriptingChat::account() { return m_chat->account(); }
 
 const QString ScriptingChat::displayName() { return m_chat->displayName(); }
 void ScriptingChat::setDisplayName(const QString& displayname) { m_chat->setDisplayName(displayname); }
@@ -146,6 +140,17 @@ void ScriptingChat::emitReceived(Kopete::Message& msg) {
 void ScriptingChat::emitSent(Kopete::Message& msg) {
     ScriptingMessage message(&msg);
     emit sent(&message);
+}
+
+void ScriptingChat::slotViewActivated(KopeteView*)
+{
+    unplugActionList("scripting_menu_tools");
+    plugActionList("scripting_menu_tools", m_actions);
+}
+
+void ScriptingChat::slotActionExecuted(const QString &name)
+{
+    m_iface->emitActionExecuted(this, name);
 }
 
 /***********************************************************************************************

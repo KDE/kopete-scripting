@@ -62,8 +62,6 @@ ScriptingPreferences::ScriptingPreferences( QWidget *parent, const QVariantList 
     : KCModule(ScriptingPreferencesFactory::componentData(), parent, args)
     , d(new Private())
 {
-    //kDebug();
-
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setSpacing(6);
     layout->setMargin(9);
@@ -95,13 +93,11 @@ ScriptingPreferences::ScriptingPreferences( QWidget *parent, const QVariantList 
 
 ScriptingPreferences::~ScriptingPreferences()
 {
-    //kDebug();
     delete d;
 }
 
 void ScriptingPreferences::slotItemChanged(QListWidgetItem* item)
 {
-    //kDebug();
     if( d->isInitialized && item ) {
         emit itemChanged(item->text(), item->checkState() == Qt::Checked);
         emit KCModule::changed(true);
@@ -143,7 +139,6 @@ void ScriptingPreferences::slotRemBtnClicked()
 
 void ScriptingPreferences::save()
 {
-    //kDebug();
     KSharedConfig::Ptr config = KGlobal::config();
     KConfigGroup group(config, "scripts");
     QStringList files_enabled, files_disabled;
@@ -160,7 +155,6 @@ void ScriptingPreferences::save()
 
 void ScriptingPreferences::load()
 {
-    //kDebug();
     d->list->blockSignals(true);
     d->list->clear();
     KSharedConfig::Ptr config = KGlobal::config();

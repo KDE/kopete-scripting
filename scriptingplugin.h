@@ -22,6 +22,9 @@
 #include <kopete/kopetemessage.h>
 #include <kopete/kopeteplugin.h>
 #include <kopete/kopetechatsessionmanager.h>
+#include <kopete/ui/kopeteview.h>
+
+//#include <kopete/kopeteview.h>
 
 //namespace Kopete { class Message; }
 //namespace Kopete { class MetaContact; }
@@ -42,6 +45,7 @@ class ScriptingPlugin : public Kopete::Plugin
         virtual void aboutToUnload();
 
     public Q_SLOTS:
+
         void slotMessageReceived(Kopete::Message& msg);
         void slotMessageSent(Kopete::Message& msg);
         void slotItemChanged(const QString& file, bool enabled);

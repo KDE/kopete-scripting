@@ -1,16 +1,20 @@
 <!DOCTYPE kpartgui>
 <kpartgui name="kopete_scripting" version="2">
 	<MenuBar>
+        <!--
 		<Menu name="edit">
 			<text>&amp;Edit</text>
             <ActionList name="scripting_menu_tools" />
 		</Menu>
+        -->
         <Menu name="tools">
             <text>&amp;Tools</text>
-            <Action name="actionSendAdvert"/>
+            <Action name="actionSendAdvert2"/>
             <ActionList name="scripting_menu_tools" />
+            <Action name="actionSendAdvert3"/>
         </Menu>
 	</MenuBar>
+    <!--
 	<Menu name="contact_popup">
         <ActionList name="scripting_contact" />
     </Menu>
@@ -19,4 +23,5 @@
         <Action name="actionSendAdvert"/>
         <ActionList name="scripting_menu_tools" />
     </Menu>
+    -->
 </kpartgui>

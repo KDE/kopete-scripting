@@ -35,6 +35,7 @@ class MyOrca:
 myconfig = MyConfig()
 myorca = MyOrca(myconfig)
 
+# This function got called if the plugin got started.
 def pluginInit():
     global myorca, myconfig
     while True:
@@ -60,11 +61,13 @@ def pluginInit():
                 return
             myconfig.url = urlEdit.text
 
+# This function got called if the plugin is going to be shutdown.
 def pluginFinish():
     global myorca, myconfig
     if myorca.isConnected:
         myorca.isConnected = False
 
+# This function got called if we received a new message.
 def messageReceived(message):
     global myorca, myconfig
     if myconfig.speakReceived:
@@ -75,6 +78,7 @@ def messageReceived(message):
             #name = message.formattedName
         myorca.speak( message.plainBody() )
 
+# This function got called if we sent a new message.
 def messageSent(message):
     global myorca, myconfig
     if myconfig.speakSent:
