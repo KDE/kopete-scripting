@@ -19,7 +19,7 @@ kde4_add_plugin(kopete_scripting ${kopete_scripting_SRCS})
 target_link_libraries(kopete_scripting ${KDE4_KDECORE_LIBS} kopete ${KDE4_KROSSUI_LIBS})
 install(TARGETS kopete_scripting DESTINATION ${PLUGIN_INSTALL_DIR})
 install(FILES kopete_scripting.desktop DESTINATION ${SERVICES_INSTALL_DIR})
-install(FILES scripting.rc DESTINATION ${DATA_INSTALL_DIR}/kopete)
+install(FILES scriptingui.rc scriptingchatui.rc DESTINATION ${DATA_INSTALL_DIR}/kopete_scripting)
 
 ########### next target ###############
 

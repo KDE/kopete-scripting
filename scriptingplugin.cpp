@@ -56,8 +56,7 @@ class ScriptingPlugin::Private
 ScriptingPlugin* ScriptingPlugin::Private::pluginStatic = 0L;
 
 ScriptingPlugin::ScriptingPlugin(QObject* parent, const QVariantList&)
-    : Kopete::Plugin(ScriptingPluginFactory::componentData(), parent)
-    , d(new Private())
+    : Kopete::Plugin(ScriptingPluginFactory::componentData(), parent), d(new Private())
 {
 	if( ! Private::pluginStatic )
         Private::pluginStatic = this;
@@ -73,6 +72,9 @@ ScriptingPlugin::ScriptingPlugin(QObject* parent, const QVariantList&)
     KConfigGroup group(config, "scripts");
     foreach(QString file, group.readEntry("files_enabled", QStringList()))
         d->triggerAction( d->createAction(file) );
+
+    setXMLFile("scriptingui.rc");
+
 }
 
 ScriptingPlugin::~ScriptingPlugin()

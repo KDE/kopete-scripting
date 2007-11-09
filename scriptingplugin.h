@@ -24,16 +24,15 @@
 #include <kopete/kopetechatsessionmanager.h>
 #include <kopete/ui/kopeteview.h>
 
-//#include <kopete/kopeteview.h>
-
-//namespace Kopete { class Message; }
-//namespace Kopete { class MetaContact; }
-//namespace Kopete { class ChatSession; }
-
 namespace Kross {
     class Action;
 }
 
+/**
+* The ScriptingPlugin implements a Kopete plugin that enables plugins
+* written in scripting languages like Python, Ruby and JavaScript
+* using the Kross scripting framework.
+*/
 class ScriptingPlugin : public Kopete::Plugin
 {
     	Q_OBJECT
@@ -48,12 +47,13 @@ class ScriptingPlugin : public Kopete::Plugin
 
         void slotMessageReceived(Kopete::Message& msg);
         void slotMessageSent(Kopete::Message& msg);
-        void slotItemChanged(const QString& file, bool enabled);
         void slotSettingsChanged();
         
         void slotActionFinished(Kross::Action*);
         void slotActionFinalized(Kross::Action*);
 
+        // this will be called by ScriptingPreferences
+        void slotItemChanged(const QString& file, bool enabled);
         // this will be called by Kopete::CommandHandler
         void commandExecuted(const QString& command, Kopete::ChatSession* chatsessions);
 

@@ -1,0 +1,14 @@
+<!DOCTYPE kpartgui>
+<kpartgui name="kopete_scripting" version="2">
+	<MenuBar>
+        <Menu name="edit">
+            <text>&amp;Edit</text>
+            <Action name="myTestAction" />
+            <ActionList name="scripting_main_contact" />
+        </Menu>
+	</MenuBar>
+    <Menu name="contact_popup">
+        <Action name="myTestAction" />
+        <ActionList name="scripting_main_contact" />
+    </Menu>
+</kpartgui>

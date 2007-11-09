@@ -3,7 +3,7 @@
 	<MenuBar>
         <Menu name="tools">
             <text>&amp;Tools</text>
-            <ActionList name="scripting_menu_tools" />
+            <ActionList name="scripting_chat_tools" />
         </Menu>
 	</MenuBar>
 </kpartgui>

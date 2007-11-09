@@ -17,7 +17,12 @@
 #include "scriptinginterface_p.h"
 #include "scriptingplugin.h"
 
-#include <QDBusConnection>
+#include <kopete/kopeteaccount.h>
+#include <kopete/kopeteaccountmanager.h>
+
+#include <kplugininfo.h>
+//#include <QDBusConnection>
+#include <QApplication>
 
 /***********************************************************************************************
 * ScriptingMessage
@@ -71,85 +76,93 @@ void ScriptingMessage::setBackgroundColor(const QColor& color) { m_message->setB
 * ScriptingChat
 */
 
-ScriptingChat::ScriptingChat(ScriptingInterface *iface, Kopete::ChatSession *chat) : QObject(iface), KXMLGUIClient(chat), m_iface(iface), m_chat(chat)
+ScriptingChat::ScriptingChat(ScriptingInterface *iface, Kopete::ChatSession *chatsession)
+    : QObject(iface), KXMLGUIClient(chatsession), d(new ScriptingChatPrivate(this))
 {
+    d->m_iface = iface;
+    d->m_chatsession = chatsession;
     setObjectName("KopeteChat");
-
-    m_signalMapper = new QSignalMapper(this);
-    connect(m_signalMapper, SIGNAL(mapped(QString)), this, SLOT(slotActionExecuted(QString)));
-
-    //connect(m_chat, SIGNAL(closing(Kopete::ChatSession*)), SIGNAL(closing()));
-    connect(m_chat, SIGNAL(messageAppended(Kopete::Message&)), SLOT(emitAppended(Kopete::Message&)));
-    connect(m_chat, SIGNAL(messageReceived(Kopete::Message&)), SLOT(emitReceived(Kopete::Message&)));
-    connect(m_chat, SIGNAL(messageSent(Kopete::Message&)), SLOT(emitSent(Kopete::Message&)));
-
-    //connect(Kopete::ChatSessionManager::self(), SIGNAL(viewCreated(KopeteView*)), SLOT(slotViewCreated(KopeteView*)));
-    connect(Kopete::ChatSessionManager::self(), SIGNAL(viewActivated(KopeteView*)), SLOT(slotViewActivated(KopeteView*)));
-    //connect(Kopete::ChatSessionManager::self(), SIGNAL(viewClosing(KopeteView*)), SLOT(slotViewClosing(KopeteView*)));
-
-    setXMLFile("scripting.rc");
+    setComponentData( ScriptingPlugin::plugin()->componentData() );
+    setXMLFile("scriptingchatui.rc");
 }
 
-ScriptingChat::~ScriptingChat() {}
-Kopete::ChatSession* ScriptingChat::chat() const { return m_chat; }
+ScriptingChat::~ScriptingChat()
+{
+    delete d;
+}
+
+Kopete::ChatSession* ScriptingChat::chat() const
+{
+    return d->m_chatsession;
+}
 
 QObject* ScriptingChat::addAction(const QString& name, const QString& text, const QString& icon)
 {
     KAction *action = icon.isEmpty() ? new KAction(text, this) : new KAction(KIcon(icon), text, this);
     action->setObjectName(name);
-    connect(action, SIGNAL(triggered()), m_signalMapper, SLOT(map()));
-    m_signalMapper->setMapping(action, name);
-    m_actions << action;
+    connect(action, SIGNAL(triggered()), d->m_signalMapper, SLOT(map()));
+    d->m_signalMapper->setMapping(action, name);
+    d->m_actions << action;
     return action;
 }
 
 QVariantList ScriptingChat::members() const
 {
     QVariantList list;
-    foreach(Kopete::Contact* c, m_chat->members())
-        list << (QObject*) c;
+    foreach(Kopete::Contact* c, d->m_chatsession->members()) {
+        QVariant v;
+        v.setValue( (QObject*) c );
+        list << v;
+    }
     return list;
 }
 
-QObject* ScriptingChat::myself() const { return const_cast<Kopete::Contact*>( m_chat->myself() ); }
-QObject* ScriptingChat::account() const { return m_chat->account(); }
+QObject* ScriptingChat::myself() const
+{
+    return const_cast<Kopete::Contact*>( d->m_chatsession->myself() );
+}
 
-const QString ScriptingChat::displayName() { return m_chat->displayName(); }
-void ScriptingChat::setDisplayName(const QString& displayname) { m_chat->setDisplayName(displayname); }
+QObject* ScriptingChat::account() const
+{
+    return d->m_chatsession->account();
+}
 
-void ScriptingChat::append(const QString &subject, const QString& body, bool isHtml)
+const QString ScriptingChat::displayName()
+{
+    return d->m_chatsession->displayName();
+}
+
+void ScriptingChat::setDisplayName(const QString& displayname)
+{
+    d->m_chatsession->setDisplayName(displayname);
+}
+
+void ScriptingChat::appendMessage(const QString& body, const QString &subject, bool isHtml)
 {
     Kopete::Message msg;
-    msg.setSubject(subject);
+    if( ! subject.isEmpty() )
+        msg.setSubject(subject);
     if( isHtml )
         msg.setHtmlBody(body);
     else
         msg.setPlainBody(body);
-    m_chat->appendMessage(msg);
+    d->m_chatsession->appendMessage(msg);
 }
 
-void ScriptingChat::emitAppended(Kopete::Message& msg) {
-    ScriptingMessage message(&msg);
-    emit appended(&message);
-}
-void ScriptingChat::emitReceived(Kopete::Message& msg) {
-    ScriptingMessage message(&msg);
-    emit received(&message);
-}
-void ScriptingChat::emitSent(Kopete::Message& msg) {
-    ScriptingMessage message(&msg);
-    emit sent(&message);
-}
-
-void ScriptingChat::slotViewActivated(KopeteView*)
+void ScriptingChat::sendMessage(const QString& body, const QString &subject, bool isHtml)
 {
-    unplugActionList("scripting_menu_tools");
-    plugActionList("scripting_menu_tools", m_actions);
-}
-
-void ScriptingChat::slotActionExecuted(const QString &name)
-{
-    m_iface->emitActionExecuted(this, name);
+    const Kopete::Contact *fromContact = d->m_chatsession->myself();
+    Q_ASSERT(fromContact);
+    const QList<Kopete::Contact*> toContacts = d->m_chatsession->members();
+    Q_ASSERT(toContacts.count() > 0); //required!
+    Kopete::Message msg(fromContact, toContacts);
+    if( ! subject.isEmpty() )
+        msg.setSubject(subject);
+    if( isHtml )
+        msg.setHtmlBody(body);
+    else
+        msg.setPlainBody(body);
+    d->m_chatsession->sendMessage(msg);
 }
 
 /***********************************************************************************************
@@ -170,7 +183,6 @@ ScriptingInterface::~ScriptingInterface()
 
 void ScriptingInterface::emitCommandExecuted(Kopete::ChatSession* chatsessions, const QString& command, const QStringList& args)
 {
-    kDebug()<<"ScriptingInterface::emitCommandExecuted command="<<command;
     int idx = d->kChats.indexOf(chatsessions);
     Q_ASSERT( idx >= 0 );
     if( idx < 0 )
@@ -188,18 +200,62 @@ void ScriptingInterface::emitCommandExecuted(Kopete::ChatSession* chatsessions, 
 
 QObject* ScriptingInterface::interface()
 {
-    //FIXME this isn't only ugly and not needed, but also limits us to
-    //the dbus-types. So,better solution would be to provide direct
-    //access to the KopeteDBusInterface instance and return it here.
-
-    if( ! d->dbusiface )
-        d->dbusiface = QDBusConnection::sessionBus().objectRegisteredAt("/Kopete");
+    if( ! d->dbusiface ) {
+        //d->dbusiface = QDBusConnection::sessionBus().objectRegisteredAt("/Kopete");
+        d->dbusiface = qApp->findChild< QObject* >("KopeteDBusInterface");
+    }
     return d->dbusiface;
 }
 
 QVariantList ScriptingInterface::chats()
 {
     return d->vChats;
+}
+
+QVariantList ScriptingInterface::accounts()
+{
+    QVariantList list;
+    foreach(Kopete::Account *a, Kopete::AccountManager::self()->accounts()) {
+        QVariant v;
+        v.setValue( (QObject*) a );
+        list << v;
+    }
+    return list;
+}
+
+QVariantList ScriptingInterface::contacts()
+{
+    QVariantList list;
+    foreach(Kopete::MetaContact *c, Kopete::ContactList::self()->metaContacts()) {
+		QVariant v;
+		v.setValue( (QObject*) c );
+        list << v;
+	}
+    return list;
+}
+
+/*
+QStringList ScriptingInterface::groups()
+{
+    QStringList list;
+    foreach(Kopete::Group *g, Kopete::ContactList::self()->groups())
+        list << g->groupId();
+    return list;
+}
+
+QString ScriptingInterface::groupName()
+{
+}
+*/
+
+QObject* ScriptingInterface::addContactAction(const QString& name, const QString& text, const QString& icon)
+{
+    KAction *action = icon.isEmpty() ? new KAction(text, this) : new KAction(KIcon(icon), text, this);
+    action->setObjectName(name);
+    connect(action, SIGNAL(triggered()), d->m_signalMapper, SLOT(map()));
+    d->m_signalMapper->setMapping(action, name);
+    d->m_contactActions << action;
+    return action;
 }
 
 bool ScriptingInterface::hasCommand(const QString &command)

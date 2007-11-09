@@ -26,13 +26,14 @@
 
 #include <QObject>
 #include <QPointer>
-#include <QSignalMapper>
 #include <kxmlguiclient.h>
 #include <kactioncollection.h>
 #include <kdebug.h>
 
 class ScriptingPlugin;
 class ScriptingInterface;
+class ScriptingInterfacePrivate;
+class ScriptingChatPrivate;
 
 /**
 * The ScriptingMessage class wraps a \a Kopete::Message to provide a scripting API
@@ -48,9 +49,9 @@ class ScriptingMessage : public QObject
 
     public Q_SLOTS:
 
-        /// Accessor method for the Contact that sent this message.
+        /// Accessor method for the \a Kopete::Contact objects that sent this message.
         QObject* sender() const;
-        /// Accessor method for the Contacts that this message was sent to.
+        /// Accessor method for the list of \a Kopete::Contact objects that this message was sent to.
         QVariantList receiver() const;
 
         /// Get the message timestamp.
@@ -95,14 +96,11 @@ class ScriptingChat : public QObject, public KXMLGUIClient
 {
         Q_OBJECT
     public:
-        ScriptingChat(ScriptingInterface *iface, Kopete::ChatSession *chat);
+        ScriptingChat(ScriptingInterface *iface, Kopete::ChatSession *chatsession);
         virtual ~ScriptingChat();
         Kopete::ChatSession* chat() const;
 
     public Q_SLOTS:
-
-        /// Add a new action to the chat window.
-        QObject* addAction(const QString& name, const QString& text, const QString& icon = QString());
 
         /// Get a list of \a Kopete::Contact instance of all contacts in the chat session.
         QVariantList members() const;
@@ -118,36 +116,25 @@ class ScriptingChat : public QObject, public KXMLGUIClient
         void setDisplayName(const QString& displayname);
 
         /// Append a message to the chat session.
-        void append(const QString &subject, const QString& body, bool isHtml = true /*, const QString &from = QString(), const QStringList &to = QStringList()*/);
+        void appendMessage(const QString& body, const QString &subject = QString(), bool isHtml = true /*, const QString &from = QString(), const QStringList &to = QStringList()*/);
+        /// Send a message to the chat session.
+        void sendMessage(const QString& body, const QString &subject = QString(), bool isHtml = true);
 
-        //void appendMessage(ScriptingMessage* msg) {}
-        //void sendMessage(ScriptingMessage* msg);
+        /// Add a new action to the chat window.
+        QObject* addAction(const QString& name, const QString& text, const QString& icon = QString());
 
     Q_SIGNALS:
-        //void closing();
 
         /// This signal is emitted if a new message in the chat got appended.
-        void appended(ScriptingMessage* message);
+        //void appended(ScriptingMessage* message);
         /// This signal is emitted if a new message in the chat got received.
-        void received(ScriptingMessage* message);
+        //void received(ScriptingMessage* message);
         /// This signal is emitted if a new message in the chat got sent.
-        void sent(ScriptingMessage* message);
-
-    private Q_SLOTS:
-        void emitAppended(Kopete::Message& msg);
-        void emitReceived(Kopete::Message& msg);
-        void emitSent(Kopete::Message& msg);
-        void slotViewActivated(KopeteView* view);
-        void slotActionExecuted(const QString &name);
+        //void sent(ScriptingMessage* message);
 
     private:
-        ScriptingInterface *m_iface;
-        Kopete::ChatSession *m_chat;
-        QSignalMapper* m_signalMapper;
-        QList<QAction*> m_actions;
+        ScriptingChatPrivate* const d;
 };
-
-class ScriptingInterfacePrivate;
 
 /**
 * The ScriptingInterface class is the interface for scripts. Each signal the
@@ -166,7 +153,8 @@ class ScriptingInterface : public QObject
         void emitMessageReceived(ScriptingMessage* message) { emit messageReceived(message); }
         void emitMessageSent(ScriptingMessage* message) { emit messageSent(message); }
         void emitCommandExecuted(Kopete::ChatSession* chatsessions, const QString& command, const QStringList& args);
-        void emitActionExecuted(ScriptingChat* chat, const QString &name) { emit actionExecuted(chat, name); }
+        void emitChatActionExecuted(ScriptingChat* chat, const QString &name) { emit chatActionExecuted(chat, name); }
+        void emitContactActionExecuted(QObject* contact, const QString &name) { emit contactActionExecuted(contact, name); }
         void emitSettingsChanged() { emit settingsChanged(); }
 
     public Q_SLOTS:
@@ -182,8 +170,21 @@ class ScriptingInterface : public QObject
         //void removeSession( Kopete::ChatSession *session );
         //QObject* findChat( const Kopete::Contact *user, Kopete::ContactPtrList chatContacts, Kopete::Protocol *protocol);
 
+        /// Return a list of \a Kopete::Account instances.
+        QVariantList accounts();
+        /// Returns a list of all \a Kopete::MetaContact instances of the contact list.
+        QVariantList contacts();
+
+        //QVariantList groups();
+
+        /// Add a new action to the main window.
+        QObject* addContactAction(const QString& name, const QString& text, const QString& icon = QString());
+
+        /// Returns true if there exist a command with the identifier \p command .
         bool hasCommand(const QString &command);
+        /// Add a new command. If the command got executed the commandExecuted() signal will be emitted.
         void addCommand(const QString &command, const QString &help = QString(), int minArgs = 0, int maxArgs = -1, const QString &icon = QString());
+        /// Remove an existing command.
         void removeCommand(const QString &command);
 
     Q_SIGNALS:
@@ -205,8 +206,10 @@ class ScriptingInterface : public QObject
 
         /// This signal got emitted if a custom command got executed.
         void commandExecuted(QObject* chat, const QString& command, const QStringList& args);
-        /// This signal got emitted if a custom action got executed.
-        void actionExecuted(QObject* chat, const QString &name);
+        /// This signal got emitted if a custom chat-action got executed.
+        void chatActionExecuted(QObject* chat, const QString &name);
+        /// This signal got emitted if a custom contact-action got executed.
+        void contactActionExecuted(QObject* contact, const QString &name);
 
         /// This signal got emitted if the Kopete settings changed.
         void settingsChanged();
