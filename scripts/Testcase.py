@@ -60,7 +60,7 @@ def messageSent(message):
 def chatAdded(chat):
     print "chatAdded chat=%s" % chat
     
-    # register a custom action.
+    # register a custom chat action.
     chat.addAction("mychataction", "My Chat Script Action", "python")
 
 # This function got called if an opened chatsession got closed.
@@ -84,9 +84,5 @@ def contactActionExecuted(contact, name):
     print "contactActionExecuted contact=%s name=%s" % (contact,name)
     if name == "mycontactaction":
         contact.execute()
-
-# This function got called if settings changed.
-def settingsChanged():
-    print "settingsChanged"
 
 print "Testcase.py loaded"

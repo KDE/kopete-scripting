@@ -99,6 +99,7 @@ class ScriptingChat : public QObject, public KXMLGUIClient
         ScriptingChat(ScriptingInterface *iface, Kopete::ChatSession *chatsession);
         virtual ~ScriptingChat();
         Kopete::ChatSession* chat() const;
+        void viewUpdated();
 
     public Q_SLOTS:
 
@@ -148,14 +149,16 @@ class ScriptingInterface : public QObject
     public:
         explicit ScriptingInterface(ScriptingPlugin *plugin);
         virtual ~ScriptingInterface();
+        void viewUpdated();
         void emitPluginInit() { emit pluginInit(); }
         void emitPluginFinish() { emit pluginFinish(); }
+        void emitChatAdded(QObject* chat) { emit chatAdded(chat); }
+        void emitChatRemoved(QObject* chat) { emit chatRemoved(chat); }
         void emitMessageReceived(ScriptingMessage* message) { emit messageReceived(message); }
         void emitMessageSent(ScriptingMessage* message) { emit messageSent(message); }
         void emitCommandExecuted(Kopete::ChatSession* chatsessions, const QString& command, const QStringList& args);
         void emitChatActionExecuted(ScriptingChat* chat, const QString &name) { emit chatActionExecuted(chat, name); }
         void emitContactActionExecuted(QObject* contact, const QString &name) { emit contactActionExecuted(contact, name); }
-        void emitSettingsChanged() { emit settingsChanged(); }
 
     public Q_SLOTS:
 
@@ -210,9 +213,6 @@ class ScriptingInterface : public QObject
         void chatActionExecuted(QObject* chat, const QString &name);
         /// This signal got emitted if a custom contact-action got executed.
         void contactActionExecuted(QObject* contact, const QString &name);
-
-        /// This signal got emitted if the Kopete settings changed.
-        void settingsChanged();
 
     private:
         ScriptingInterfacePrivate* const d;

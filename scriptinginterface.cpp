@@ -82,7 +82,7 @@ ScriptingChat::ScriptingChat(ScriptingInterface *iface, Kopete::ChatSession *cha
     d->m_iface = iface;
     d->m_chatsession = chatsession;
     setObjectName("KopeteChat");
-    setComponentData( ScriptingPlugin::plugin()->componentData() );
+    setComponentData(ScriptingPlugin::plugin()->componentData());
     setXMLFile("scriptingchatui.rc");
 }
 
@@ -94,6 +94,11 @@ ScriptingChat::~ScriptingChat()
 Kopete::ChatSession* ScriptingChat::chat() const
 {
     return d->m_chatsession;
+}
+
+void ScriptingChat::viewUpdated()
+{
+    d->viewUpdated();
 }
 
 QObject* ScriptingChat::addAction(const QString& name, const QString& text, const QString& icon)
@@ -181,14 +186,19 @@ ScriptingInterface::~ScriptingInterface()
     delete d;
 }
 
+void ScriptingInterface::viewUpdated()
+{
+    d->viewUpdated();
+}
+
 void ScriptingInterface::emitCommandExecuted(Kopete::ChatSession* chatsessions, const QString& command, const QStringList& args)
 {
-    int idx = d->kChats.indexOf(chatsessions);
+    int idx = d->m_kChats.indexOf(chatsessions);
     Q_ASSERT( idx >= 0 );
     if( idx < 0 )
         return;
-    Q_ASSERT( idx < d->vChats.count() );
-    QVariant v = d->vChats[idx];
+    Q_ASSERT( idx < d->m_vChats.count() );
+    QVariant v = d->m_vChats[idx];
     QObject* obj = v.value<QObject*>();
     Q_ASSERT( obj );
     ScriptingChat* chat = dynamic_cast<ScriptingChat*>(obj);
@@ -200,16 +210,16 @@ void ScriptingInterface::emitCommandExecuted(Kopete::ChatSession* chatsessions, 
 
 QObject* ScriptingInterface::interface()
 {
-    if( ! d->dbusiface ) {
-        //d->dbusiface = QDBusConnection::sessionBus().objectRegisteredAt("/Kopete");
-        d->dbusiface = qApp->findChild< QObject* >("KopeteDBusInterface");
+    if( ! d->m_dbusiface ) {
+        //d->m_dbusiface = QDBusConnection::sessionBus().objectRegisteredAt("/Kopete");
+        d->m_dbusiface = qApp->findChild< QObject* >("KopeteDBusInterface");
     }
-    return d->dbusiface;
+    return d->m_dbusiface;
 }
 
 QVariantList ScriptingInterface::chats()
 {
-    return d->vChats;
+    return d->m_vChats;
 }
 
 QVariantList ScriptingInterface::accounts()
@@ -233,20 +243,6 @@ QVariantList ScriptingInterface::contacts()
 	}
     return list;
 }
-
-/*
-QStringList ScriptingInterface::groups()
-{
-    QStringList list;
-    foreach(Kopete::Group *g, Kopete::ContactList::self()->groups())
-        list << g->groupId();
-    return list;
-}
-
-QString ScriptingInterface::groupName()
-{
-}
-*/
 
 QObject* ScriptingInterface::addContactAction(const QString& name, const QString& text, const QString& icon)
 {

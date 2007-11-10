@@ -61,20 +61,19 @@ ScriptingPlugin::ScriptingPlugin(QObject* parent, const QVariantList&)
 	if( ! Private::pluginStatic )
         Private::pluginStatic = this;
 
+    setXMLFile("scriptingui.rc");
+
     d->interface = new ScriptingInterface(this);
     d->collection = new Kross::ActionCollection("plugins", Kross::Manager::self().actionCollection());
 
 	connect(Kopete::ChatSessionManager::self(), SIGNAL(aboutToReceive(Kopete::Message&)), SLOT(slotMessageReceived(Kopete::Message&)));
     connect(Kopete::ChatSessionManager::self(), SIGNAL(aboutToSend(Kopete::Message&)), SLOT(slotMessageSent(Kopete::Message&)));   
-	connect(this, SIGNAL(settingsChanged()), SLOT(slotSettingsChanged()));
+    connect(this, SIGNAL(settingsChanged()), SLOT(slotSettingsChanged()));
 
     KSharedConfig::Ptr config = KGlobal::config();
     KConfigGroup group(config, "scripts");
     foreach(QString file, group.readEntry("files_enabled", QStringList()))
         d->triggerAction( d->createAction(file) );
-
-    setXMLFile("scriptingui.rc");
-
 }
 
 ScriptingPlugin::~ScriptingPlugin()
@@ -132,12 +131,6 @@ void ScriptingPlugin::slotItemChanged(const QString& file, bool enabled)
         d->triggerAction(action);
 }
 
-void ScriptingPlugin::slotSettingsChanged()
-{
-    kDebug()<<"ScriptingPlugin::slotSettingsChanged";
-    d->interface->emitSettingsChanged();
-}
-
 void ScriptingPlugin::slotActionFinished(Kross::Action*)
 {
     kDebug()<<"ScriptingPlugin::slotActionFinished";
@@ -167,6 +160,11 @@ void ScriptingPlugin::commandExecuted(const QString& command, Kopete::ChatSessio
     kDebug()<<"ScriptingPlugin::commandExecuted name="<<name<<"command="<<command;
     QStringList args = Kopete::CommandHandler::parseArguments(command);
     d->interface->emitCommandExecuted(chatsessions, name, args);
+}
+
+void ScriptingPlugin::slotSettingsChanged()
+{
+    d->interface->viewUpdated();
 }
 
 #include "scriptingplugin.moc"

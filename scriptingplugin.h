@@ -47,7 +47,6 @@ class ScriptingPlugin : public Kopete::Plugin
 
         void slotMessageReceived(Kopete::Message& msg);
         void slotMessageSent(Kopete::Message& msg);
-        void slotSettingsChanged();
         
         void slotActionFinished(Kross::Action*);
         void slotActionFinalized(Kross::Action*);
@@ -56,6 +55,8 @@ class ScriptingPlugin : public Kopete::Plugin
         void slotItemChanged(const QString& file, bool enabled);
         // this will be called by Kopete::CommandHandler
         void commandExecuted(const QString& command, Kopete::ChatSession* chatsessions);
+
+        void slotSettingsChanged();
 
     private:
         class Private;
