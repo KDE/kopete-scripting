@@ -1,9 +1,8 @@
 [Desktop Entry]
-Encoding=UTF-8
 Type=Service
 X-Kopete-Version=1000900
 Icon=launch
-ServiceTypes=Kopete/Plugin
+X-KDE-ServiceTypes=Kopete/Plugin
 X-KDE-Library=kopete_scripting
 X-KDE-PluginInfo-Author=Sebastian Sauer
 X-KDE-PluginInfo-Email=mail@dipe.org
