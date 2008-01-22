@@ -23,7 +23,8 @@
 #include <kplugininfo.h>
 //#include <QDBusConnection>
 #include <QApplication>
-
+#include <KAction>
+#include <KIcon>
 /***********************************************************************************************
 * ScriptingMessage
 */

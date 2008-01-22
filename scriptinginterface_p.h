@@ -20,6 +20,7 @@
 #include "scriptingplugin.h"
 
 #include <QObject>
+#include <QAction>
 #include <QSignalMapper>
 
 #include <kopete/kopetepluginmanager.h>
