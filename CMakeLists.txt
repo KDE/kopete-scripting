@@ -8,7 +8,7 @@ find_package(Kopete)
 
 add_definitions (${QT_DEFINITIONS} ${KDE4_DEFINITIONS})
 include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
-include_directories(${KOPETE_INCLUDES})
+include_directories(${KOPETE_INCLUDE_DIR})
 
 add_subdirectory( scripts ) 
 
