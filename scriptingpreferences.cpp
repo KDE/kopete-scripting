@@ -54,7 +54,7 @@ class ScriptingPreferences::Private
                 checked = false;
             }
             item->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
-            return item;     
+            return item;
         }
 };
 
@@ -62,7 +62,8 @@ ScriptingPreferences::ScriptingPreferences( QWidget *parent, const QVariantList 
     : KCModule(ScriptingPreferencesFactory::componentData(), parent, args)
     , d(new Private())
 {
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    QVBoxLayout* layout = new QVBoxLayout;
+    setLayout( layout );
     layout->setSpacing(6);
     layout->setMargin(9);
 
@@ -70,9 +71,9 @@ ScriptingPreferences::ScriptingPreferences( QWidget *parent, const QVariantList 
     connect(d->list, SIGNAL(itemChanged(QListWidgetItem*)), SLOT(slotItemChanged(QListWidgetItem*)));
     layout->addWidget(d->list);
 
-    QHBoxLayout* btnLayout = new QHBoxLayout(this);
+    QHBoxLayout* btnLayout = new QHBoxLayout;
     layout->addLayout(btnLayout);
-    
+
     QPushButton *addbtn = new QPushButton(i18n("Add..."), this);
     connect(addbtn, SIGNAL(clicked()), SLOT(slotAddBtnClicked()));
     btnLayout->addWidget(addbtn);
