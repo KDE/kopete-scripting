@@ -16,7 +16,13 @@ add_subdirectory( scripts )
 
 set(kopete_scripting_SRCS scriptingplugin.cpp scriptinginterface.cpp)
 kde4_add_plugin(kopete_scripting ${kopete_scripting_SRCS})
-target_link_libraries(kopete_scripting ${KDE4_KDECORE_LIBS} kopete ${KDE4_KROSSUI_LIBS})
+target_link_libraries(
+    kopete_scripting
+    kopete
+    ${KDE4_KDECORE_LIBS}
+    ${KDE4_KDEUI_LIBS}
+    ${KDE4_KROSSUI_LIBS}
+    )
 install(TARGETS kopete_scripting DESTINATION ${PLUGIN_INSTALL_DIR})
 install(FILES kopete_scripting.desktop DESTINATION ${SERVICES_INSTALL_DIR})
 install(FILES scriptingui.rc scriptingchatui.rc DESTINATION ${DATA_INSTALL_DIR}/kopete_scripting)
@@ -26,6 +32,14 @@ install(FILES scriptingui.rc scriptingchatui.rc DESTINATION ${DATA_INSTALL_DIR}/
 set(kcm_kopete_scripting_SRCS scriptingpreferences.cpp)
 #kde4_add_ui_files(kcm_kopete_scripting_SRCS scriptingpreferencesbase.ui )
 kde4_add_plugin(kcm_kopete_scripting ${kcm_kopete_scripting_SRCS})
-target_link_libraries(kcm_kopete_scripting ${KDE4_KUTILS_LIBS} ${KDE4_KNOTIFYCONFIG_LIBS} ${KDE4_KROSSUI_LIBS} kopete)
+target_link_libraries(
+    kcm_kopete_scripting
+    kopete
+    ${KDE4_KIO_LIBS}
+    ${KDE4_KDEUI_LIBS}
+    ${KDE4_KUTILS_LIBS}
+    ${KDE4_KNOTIFYCONFIG_LIBS}
+    ${KDE4_KROSSUI_LIBS}
+    )
 install(TARGETS kcm_kopete_scripting DESTINATION ${PLUGIN_INSTALL_DIR})
 install(FILES kopete_scripting_config.desktop DESTINATION ${SERVICES_INSTALL_DIR}/kconfiguredialog)
