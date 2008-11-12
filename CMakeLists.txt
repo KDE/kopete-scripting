@@ -21,6 +21,7 @@ target_link_libraries(
     kopete
     ${KDE4_KDECORE_LIBS}
     ${KDE4_KDEUI_LIBS}
+    ${KDE4_KROSSCORE_LIBS}
     ${KDE4_KROSSUI_LIBS}
     )
 install(TARGETS kopete_scripting DESTINATION ${PLUGIN_INSTALL_DIR})
@@ -39,6 +40,7 @@ target_link_libraries(
     ${KDE4_KDEUI_LIBS}
     ${KDE4_KUTILS_LIBS}
     ${KDE4_KNOTIFYCONFIG_LIBS}
+    ${KDE4_KROSSCORE_LIBS}
     ${KDE4_KROSSUI_LIBS}
     )
 install(TARGETS kcm_kopete_scripting DESTINATION ${PLUGIN_INSTALL_DIR})
