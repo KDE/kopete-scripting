@@ -52,7 +52,7 @@ QVariantList ScriptingMessage::receiver() const
 {
     QVariantList list;
     foreach(Kopete::Contact* c, m_message->to())
-        list << (QObject*) c;
+        list << qVariantFromValue((QObject*)c);
     return list;
 }
 
