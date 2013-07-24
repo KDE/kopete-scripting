@@ -27,7 +27,7 @@
 #include <kross/core/actioncollection.h>
 
 K_PLUGIN_FACTORY(ScriptingPluginFactory, registerPlugin<ScriptingPlugin>();)
-K_EXPORT_PLUGIN(ScriptingPluginFactory("kopete_scripting"))
+K_EXPORT_PLUGIN(ScriptingPluginFactory("kopete_scripting", "kcm_kopete_scripting"))
 
 class ScriptingPlugin::Private
 {
