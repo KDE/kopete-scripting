@@ -6,6 +6,7 @@ X-KDE-Library=kcm_kopete_scripting
 X-KDE-ParentApp=kopete_scripting
 X-KDE-ParentComponents=kopete_scripting
 Name=Scripting
+Name[ast]=Scripting
 Name[bg]=Скриптиране
 Name[bs]=Skriptovanje
 Name[cs]=Skriptování
